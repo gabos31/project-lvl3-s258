@@ -5,16 +5,15 @@
   </head>
   <body>
     <div id="point"></div>
-    <main role="main" class="container">
       <div class="jumbotron">
         <form>
           <div class="form-group">
-            <label for="textarea1">Textarea</label>
-            <textarea class="form-control" id="textarea1" rows="10"></textarea>
+            <label for="inputFeed">RSS-Feed</label>
+            <input class="form-control" type="url" id="inputFeed" aria-describedby="rssFeedHelper">
+            <small id="rssFeedHelper" class="form-text text-muted">Enter url to add feed</small>
           </div>
-          <button class="btn btn-lg btn-primary">Button</button>
+          <button class="btn btn-primary">Add</button>
         </form>
       </div>
-    </main>
   </body>
 </html>
