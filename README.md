@@ -1,0 +1,1 @@
+[![Build Status](https://travis-ci.org/gabos31/project-lvl3-s258.svg?branch=master)](https://travis-ci.org/gabos31/project-lvl3-s258)
