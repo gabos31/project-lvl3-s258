@@ -8,8 +8,26 @@ export default () => {
   const proxy = 'https://cors-anywhere.herokuapp.com/';
   const inputFeed = document.getElementById('inputFeed');
   const inputForm = document.getElementById('inputForm');
+  const mainAlert = document.getElementById('mainAlert');
 
-  const makeFeedList = ({ data }, feedUrl) => {
+  const timeout = time => setTimeout(() => {
+    mainAlert.className = '';
+    mainAlert.textContent = '';
+  }, time);
+
+  const makeAlert = ({ status, statusText, data }) => {
+    if (status !== 200) {
+      mainAlert.classList.replace('alert-primary', 'alert-danger');
+      mainAlert.textContent = `Error, ${statusText}`;
+    } else {
+      mainAlert.classList.replace('alert-primary', 'alert-success');
+      mainAlert.textContent = 'RSS-Feed and articles added!';
+      timeout(4000);
+    }
+    return data;
+  };
+
+  const makeFeedList = (data, feedUrl) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(data, 'application/xml');
     const title = doc.querySelector('channel > title').textContent;
@@ -60,9 +78,18 @@ export default () => {
       e.stopPropagation();
       inputFeed.classList.add('is-invalid');
     } else {
+      mainAlert.classList.remove('alert-danger');
+      mainAlert.classList.add('alert', 'alert-primary');
+      mainAlert.textContent = 'Loading...';
       axios.get(`${proxy}${feedUrl}`)
-        .then(response => makeFeedList(response, feedUrl))
-        .then(doc => makeArticlesList(doc));
+        .then(response => makeAlert(response))
+        .then(data => makeFeedList(data, feedUrl))
+        .then(doc => makeArticlesList(doc))
+        .catch((err) => {
+          mainAlert.classList.add('alert-danger');
+          mainAlert.textContent = err;
+          timeout(4000);
+        });
     }
   });
 };
