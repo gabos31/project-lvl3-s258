@@ -1,9 +1,42 @@
 <!doctype html>
 <html>
   <head>
-    <title>Webpack Package</title>
+    <title>RSS-reader</title>
   </head>
   <body>
-    <div id="point"></div>
+    <div class="container-fluid">  
+      <div class="jumbotron">
+        <div id="mainAlert" role="alert"></div>
+        <form id="inputForm" novalidate>
+          <div class="form-group">
+            <label for="inputFeed">RSS-Feed</label>
+            <input class="form-control" type="text" id="inputFeed" required>
+            <div class="invalid-feedback">
+              Please provide a valid Feed-URL.
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit">Add</button>
+        </form>
+      </div>
+    </div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col">
+          <label for="feedTable">List of RSS-Feeds</label>
+          <table class="table table-bordered" id="feedTable">
+            <thead>
+              <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <div class="col">
+          <label for="articlesList">List of articles</label>
+          <ul id="articlesList" class="list-unstyled"></ul>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
