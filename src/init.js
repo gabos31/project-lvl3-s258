@@ -116,6 +116,11 @@ export default () => {
     pDescr.text(description);
     const modalLink = $('#modalLink');
     modalLink.attr('href', link);
+  }).on('hide.bs.modal', () => {
+    const buttons = $('li > button');
+    buttons.each((i, button) => {
+      $(button).css('box-shadow', 'none');
+    });
   });
 
   inputFeed.addEventListener('input', () => {
