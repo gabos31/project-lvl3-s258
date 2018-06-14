@@ -23,8 +23,8 @@ const manageLoadingState = ({ status, statusText, data }) => {
   return data;
 };
 
-const makeFeedList = (state, url) => {
-  const { feedTitle, feedDescription } = state.feeds[url];
+const makeFeedList = (feeds, url) => {
+  const { feedTitle, feedDescription } = feeds[url];
   const feedTable = document.getElementById('feedTable');
   const tr = feedTable.insertRow();
   const tdTitle = tr.insertCell();
@@ -36,8 +36,8 @@ const makeFeedList = (state, url) => {
   inputFeed.classList.remove('is-valid');
 };
 
-const makeArticlesList = (state, url) => {
-  const { articleLinks, articleTitles, articleDescriptions } = state.feeds[url];
+const makeArticlesList = (feeds, url) => {
+  const { articleLinks, articleTitles, articleDescriptions } = feeds[url];
   const articlesUl = document.getElementById('articlesList');
   articleLinks.forEach((link, i) => {
     const a = document.createElement('a');
@@ -90,9 +90,9 @@ const hideModalHandler = () => {
   buttons.css('box-shadow', 'none');
 };
 
-const inputUrlHandler = (state) => {
+const inputUrlHandler = (checkUrlResult) => {
   const inputFeed = document.getElementById('inputFeed');
-  switch (state.checkUrlResult) {
+  switch (checkUrlResult) {
     case 'empty':
       inputFeed.className = 'form-control';
       break;

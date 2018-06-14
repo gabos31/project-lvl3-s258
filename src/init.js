@@ -89,7 +89,7 @@ export default () => {
     const url = inputFeed.value;
     const checkUrlResult = checkUrl(url);
     saveCheckUrlResult(checkUrlResult);
-    renderers.inputUrlHandler(state);
+    renderers.inputUrlHandler(state.checkUrlResult);
     if (state.checkUrlResult === 'valid') {
       state.url = url;
     }
@@ -108,8 +108,8 @@ export default () => {
         .then(parsedRss => extractRssElements(parsedRss))
         .then(rssElements => extractRssData(rssElements))
         .then(rssData => saveRss(rssData, feedUrl))
-        .then(() => renderers.makeFeedList(state, feedUrl))
-        .then(() => renderers.makeArticlesList(state, feedUrl))
+        .then(() => renderers.makeFeedList(state.feeds, feedUrl))
+        .then(() => renderers.makeArticlesList(state.feeds, feedUrl))
         .catch(renderers.processErrors);
     }
   });
