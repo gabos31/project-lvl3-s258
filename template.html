@@ -4,20 +4,38 @@
     <title>RSS-reader</title>
   </head>
   <body>
-    <div class="container-fluid">  
+    <div class="container-fluid">
       <div class="jumbotron">
-        <div id="mainAlert" role="alert"></div>
-        <form id="inputForm" novalidate>
+        <div class="modal fade" id="modalDescription" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p id="pDescr"></p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-outline-light">
+                  <a id="modalLink" href="#">Follow the link</a>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <form id="inputForm">
           <div class="form-group">
             <label for="inputFeed">RSS-Feed</label>
             <input class="form-control" type="text" id="inputFeed" required>
-            <div class="invalid-feedback">
-              Please provide a valid Feed-URL.
-            </div>
           </div>
-          <button class="btn btn-primary" type="submit">Add</button>
+          <button id="submitBtn" class="btn btn-primary" type="submit">Add</button>
         </form>
       </div>
+      <div id="mainAlert" role="alert"></div>
     </div>
     <div class="container-fluid">
       <div class="row">
