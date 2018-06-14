@@ -32,43 +32,18 @@ export default () => {
     if (parsedRss.doctype !== null) {
       throw new Error('This page does not contain rss.');
     }
-    return parsedRss;
-  };
-
-  const extractRssElements = (parsedRss) => {
-    const feedTitleElm = parsedRss.querySelector('channel > title');
-    const feedDescriptionElm = parsedRss.querySelector('channel > description');
+    const feedTitle = parsedRss.querySelector('channel > title').textContent;
+    const feedDescription = parsedRss.querySelector('channel > description').textContent;
     const articleLinksColl = parsedRss.querySelectorAll('item > link');
     const articleTitlesColl = parsedRss.querySelectorAll('item > title');
     const articleDescriptionsColl = parsedRss.querySelectorAll('item > description');
-    return {
-      feedTitleElm,
-      feedDescriptionElm,
-      articleLinksColl,
-      articleTitlesColl,
-      articleDescriptionsColl,
-    };
-  };
-
-  const extractRssData = ({
-    feedTitleElm,
-    feedDescriptionElm,
-    articleLinksColl,
-    articleTitlesColl,
-    articleDescriptionsColl,
-  }) => {
-    const feedTitle = feedTitleElm.textContent;
-    const feedDescription = feedDescriptionElm.textContent;
     const articleLinks = [];
     const articleTitles = [];
     const articleDescriptions = [];
     articleLinksColl.forEach(link => articleLinks.push(link.textContent));
-    articleTitlesColl.forEach((title, i) => articleTitles.push(title.textContent ||
-      articleDescriptionsColl.item(i).textContent.split('<')[0]));
+    articleTitlesColl.forEach(title => articleTitles.push(title.textContent));
     articleDescriptionsColl.forEach(description =>
-      articleDescriptions.push(description === null || !description.textContent ||
-        description.textContent[0] === '<' ? 'This article does not have a description' :
-        description.textContent.split('<')[0]));
+      articleDescriptions.push(description.textContent));
     return {
       feedTitle,
       feedDescription,
@@ -107,9 +82,7 @@ export default () => {
       axios.get(`${proxy}${feedUrl}`)
         .then(response => renderers.manageLoadingState(response))
         .then(data => parseRss(data))
-        .then(parsedRss => extractRssElements(parsedRss))
-        .then(rssElements => extractRssData(rssElements))
-        .then(rssData => saveRss(rssData, feedUrl))
+        .then(parsedRss => saveRss(parsedRss, feedUrl))
         .then(() => renderers.makeFeedList(state.feeds, feedUrl))
         .then(() => renderers.makeArticlesList(state.feeds, feedUrl))
         .catch(renderers.processErrors);

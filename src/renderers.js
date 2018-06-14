@@ -7,20 +7,27 @@ const activateForm = () => {
   submitBtn.disabled = false;
 };
 
+const makeAlert = (type, text) => {
+  const root = document.getElementById('mainAlert');
+  const alert = document.createElement('div');
+  alert.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+      ${text}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`;
+  root.prepend(alert);
+};
+
 const manageLoadingState = ({ status, statusText, data }) => {
-  const mainAlert = document.getElementById('mainAlert');
   activateForm();
   if (status !== 200) {
     throw new Error(statusText);
   } else {
-    mainAlert.classList.replace('alert-primary', 'alert-success');
-    mainAlert.textContent = 'RSS-Feed and articles added!';
+    $('.alert').remove(this);
+    makeAlert('success', 'RSS-Feed and articles added!');
     $('[hidden]').removeAttr('hidden');
   }
-  setTimeout(() => {
-    mainAlert.className = '';
-    mainAlert.textContent = '';
-  }, 2000);
   return data;
 };
 
@@ -43,8 +50,9 @@ const makeArticlesList = (feeds, url) => {
   articleLinks.forEach((link, i) => {
     const a = document.createElement('a');
     a.href = link;
-    const title = articleTitles[i];
-    const description = articleDescriptions[i];
+    const title = articleTitles[i] || articleDescriptions[i].split('<')[0];
+    const description = !articleDescriptions[i] || articleDescriptions[i][0] === '<' ?
+      'This article does not have a description' : articleDescriptions[i].split('<')[0];
     a.textContent = `  ${title}`;
     const li = document.createElement('li');
     const button = document.createElement('button');
@@ -63,14 +71,12 @@ const makeArticlesList = (feeds, url) => {
 };
 
 const launchDownloading = () => {
-  const mainAlert = document.getElementById('mainAlert');
   const submitBtn = document.getElementById('submitBtn');
   const inputFeed = document.getElementById('inputFeed');
   submitBtn.disabled = true;
   inputFeed.setAttribute('readonly', '');
-  mainAlert.classList.remove('alert-danger');
-  mainAlert.classList.add('alert', 'alert-primary');
-  mainAlert.textContent = 'Loading...';
+  $('.alert').remove(this);
+  makeAlert('info', 'Loading...');
 };
 
 const showModalHandler = (e) => {
@@ -108,14 +114,14 @@ const inputUrlHandler = (checkUrlResult) => {
 
 const processErrors = (err) => {
   console.log(err);
-  const mainAlert = document.getElementById('mainAlert');
+  if ($('tr').length < 2) {
+    $('[for="feedTable"]').attr('hidden', '');
+    $('[for="articlesList"]').attr('hidden', '');
+    $('#feedTable').attr('hidden', '');
+  }
   activateForm();
-  mainAlert.classList.add('alert-danger');
-  mainAlert.textContent = err;
-  setTimeout(() => {
-    mainAlert.className = '';
-    mainAlert.textContent = '';
-  }, 4000);
+  $('.alert').remove(this);
+  makeAlert('danger', err);
 };
 
 export default {
