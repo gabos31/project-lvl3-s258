@@ -7,12 +7,10 @@ import renderers from './renderers';
 export default () => {
   const state = {
     checkUrlResult: 'empty',
+    url: '',
     feeds: {},
     articlesList: [],
   };
-  const proxy = 'https://cors-anywhere.herokuapp.com/';
-  const inputFeed = document.getElementById('inputFeed');
-  const inputForm = document.getElementById('inputForm');
 
   const checkUrl = (url) => {
     if (url === '') {
@@ -86,17 +84,24 @@ export default () => {
     .on('show.bs.modal', renderers.showModalHandler)
     .on('hide.bs.modal', renderers.hideModalHandler);
 
+  const inputFeed = document.getElementById('inputFeed');
   inputFeed.addEventListener('input', () => {
-    const checkUrlResult = checkUrl(inputFeed.value);
+    const url = inputFeed.value;
+    const checkUrlResult = checkUrl(url);
     saveCheckUrlResult(checkUrlResult);
     renderers.inputUrlHandler(state);
+    if (state.checkUrlResult === 'valid') {
+      state.url = url;
+    }
   });
 
+  const inputForm = document.getElementById('inputForm');
   inputForm.addEventListener('submit', (e) => {
     e.preventDefault();
     if (state.checkUrlResult === 'valid') {
-      const feedUrl = inputFeed.value;
+      const feedUrl = state.url;
       renderers.launchDownloading();
+      const proxy = 'https://cors-anywhere.herokuapp.com/';
       axios.get(`${proxy}${feedUrl}`)
         .then(response => renderers.manageLoadingState(response))
         .then(data => parseRss(data))
