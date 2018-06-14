@@ -15,6 +15,7 @@ const manageLoadingState = ({ status, statusText, data }) => {
   } else {
     mainAlert.classList.replace('alert-primary', 'alert-success');
     mainAlert.textContent = 'RSS-Feed and articles added!';
+    $('[hidden]').removeAttr('hidden');
   }
   setTimeout(() => {
     mainAlert.className = '';
@@ -85,10 +86,8 @@ const showModalHandler = (e) => {
   modalLink.attr('href', link);
 };
 
-const hideModalHandler = () => {
-  const buttons = $('li > button');
-  buttons.css('box-shadow', 'none');
-};
+const hideModalHandler = () =>
+  $('li > button').css('box-shadow', 'none');
 
 const inputUrlHandler = (checkUrlResult) => {
   const inputFeed = document.getElementById('inputFeed');

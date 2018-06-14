@@ -28,6 +28,7 @@ export default () => {
   const parseRss = (data) => {
     const parser = new DOMParser();
     const parsedRss = parser.parseFromString(data, 'application/xml');
+    console.log(parsedRss);
     if (parsedRss.doctype !== null) {
       throw new Error('This page does not contain rss.');
     }
@@ -65,8 +66,9 @@ export default () => {
     articleTitlesColl.forEach((title, i) => articleTitles.push(title.textContent ||
       articleDescriptionsColl.item(i).textContent.split('<')[0]));
     articleDescriptionsColl.forEach(description =>
-      articleDescriptions.push(description === null || description.textContent[0] === '<' ?
-        'This article does not have a description' : description.textContent.split('<')[0]));
+      articleDescriptions.push(description === null || !description.textContent ||
+        description.textContent[0] === '<' ? 'This article does not have a description' :
+        description.textContent.split('<')[0]));
     return {
       feedTitle,
       feedDescription,
