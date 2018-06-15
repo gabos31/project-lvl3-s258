@@ -9,7 +9,11 @@ export default () => {
     checkUrlResult: 'empty',
     url: '',
     feeds: {},
-    articlesList: [],
+    articlesData: {
+      articleLinks: [],
+      articleTitles: [],
+      articleDescriptions: [],
+    },
   };
 
   const checkUrl = (url) => {
@@ -28,7 +32,6 @@ export default () => {
   const parseRss = (data) => {
     const parser = new DOMParser();
     const parsedRss = parser.parseFromString(data, 'application/xml');
-    console.log(parsedRss);
     if (parsedRss.doctype !== null) {
       throw new Error('This page does not contain rss.');
     }
@@ -54,7 +57,47 @@ export default () => {
   };
 
   const saveRss = (parsedRss, url) => {
-    state.feeds[url] = parsedRss;
+    const {
+      feedTitle,
+      feedDescription,
+      articleLinks,
+      articleTitles,
+      articleDescriptions,
+    } = parsedRss;
+    state.feeds[url] = { feedTitle, feedDescription };
+    state.articlesData.articleLinks.push(...articleLinks);
+    state.articlesData.articleTitles.push(...articleTitles);
+    state.articlesData.articleDescriptions.push(...articleDescriptions);
+  };
+
+  const proxy = 'https://cors-anywhere.herokuapp.com/';
+
+  const makeUnionList = (rssDataArr, name) => {
+    const oldList = state.articlesData[name];
+    const newList = _.flatten(rssDataArr.map(rssData =>
+      rssData[name]));
+    return _.union(oldList, newList);
+  };
+
+  const updateArticlesData = (newArticlesData) => {
+    state.articlesData = newArticlesData;
+  };
+
+  const updateArticles = () => {
+    const feedLinks = _.keys(state.feeds);
+    const promisesArr = feedLinks.map(link => axios.get(`${proxy}${link}`));
+    Promise.all(promisesArr)
+      .then((responses) => {
+        const rssDataArr = responses.map(({ data }) => parseRss(data));
+        const newArticlesData = {
+          articleLinks: makeUnionList(rssDataArr, 'articleLinks'),
+          articleTitles: makeUnionList(rssDataArr, 'articleTitles'),
+          articleDescriptions: makeUnionList(rssDataArr, 'articleDescriptions'),
+        };
+        updateArticlesData(newArticlesData);
+        renderers.updateArticlesList(state.articlesData);
+        setTimeout(() => updateArticles(), 5000);
+      });
   };
 
   $('#modalDescription')
@@ -78,14 +121,23 @@ export default () => {
     if (state.checkUrlResult === 'valid') {
       const feedUrl = state.url;
       renderers.launchDownloading();
-      const proxy = 'https://cors-anywhere.herokuapp.com/';
       axios.get(`${proxy}${feedUrl}`)
         .then(response => renderers.manageLoadingState(response))
         .then(data => parseRss(data))
-        .then(parsedRss => saveRss(parsedRss, feedUrl))
+        .then(rssData => saveRss(rssData, feedUrl))
         .then(() => renderers.makeFeedList(state.feeds, feedUrl))
-        .then(() => renderers.makeArticlesList(state.feeds, feedUrl))
+        .then(() => renderers.updateArticlesList(state.articlesData))
         .catch(renderers.processErrors);
     }
   });
+
+  const checkFeeds = () => {
+    if (!_.isEmpty(_.keys(state.feeds))) {
+      setTimeout(() => updateArticles(), 5000);
+    } else {
+      setTimeout(() => checkFeeds(), 1000);
+    }
+  };
+
+  checkFeeds();
 };

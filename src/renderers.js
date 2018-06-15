@@ -44,18 +44,17 @@ const makeFeedList = (feeds, url) => {
   inputFeed.classList.remove('is-valid');
 };
 
-const makeArticlesList = (feeds, url) => {
-  const { articleLinks, articleTitles, articleDescriptions } = feeds[url];
+const updateArticlesList = ({ articleLinks, articleTitles, articleDescriptions }) => {
+  $('#articlesList').empty();
   const articlesUl = document.getElementById('articlesList');
   articleLinks.forEach((link, i) => {
     const a = document.createElement('a');
-    a.href = link;
     const title = articleTitles[i] || articleDescriptions[i].split('<')[0];
+    a.href = link;
+    a.textContent = `  ${title}`;
+    const button = document.createElement('button');
     const description = !articleDescriptions[i] || articleDescriptions[i][0] === '<' ?
       'This article does not have a description' : articleDescriptions[i].split('<')[0];
-    a.textContent = `  ${title}`;
-    const li = document.createElement('li');
-    const button = document.createElement('button');
     button.classList.add('btn', 'btn-outline-secondary', 'btn-sm');
     button.textContent = '...';
     button.type = 'button';
@@ -64,10 +63,12 @@ const makeArticlesList = (feeds, url) => {
     button.setAttribute('data-title', title);
     button.setAttribute('data-description', description);
     button.setAttribute('data-link', link);
+    const li = document.createElement('li');
     li.append(button);
     li.append(a);
-    articlesUl.append(li);
+    articlesUl.prepend(li);
   });
+  console.log(articlesUl);
 };
 
 const launchDownloading = () => {
@@ -125,10 +126,9 @@ const processErrors = (err) => {
 };
 
 export default {
-  activateForm,
   manageLoadingState,
   makeFeedList,
-  makeArticlesList,
+  updateArticlesList,
   launchDownloading,
   showModalHandler,
   hideModalHandler,
