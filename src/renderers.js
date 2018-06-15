@@ -8,6 +8,7 @@ const activateForm = () => {
 };
 
 const makeAlert = (type, text) => {
+  $('.alert').remove(this);
   const root = document.getElementById('mainAlert');
   const alert = document.createElement('div');
   alert.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
@@ -24,7 +25,6 @@ const manageLoadingState = ({ status, statusText, data }) => {
   if (status !== 200) {
     throw new Error(statusText);
   } else {
-    $('.alert').remove(this);
     makeAlert('success', 'RSS-Feed and articles added!');
     $('[hidden]').removeAttr('hidden');
   }
@@ -68,7 +68,6 @@ const updateArticlesList = ({ articleLinks, articleTitles, articleDescriptions }
     li.append(a);
     articlesUl.prepend(li);
   });
-  console.log(articlesUl);
 };
 
 const launchDownloading = () => {
@@ -76,7 +75,6 @@ const launchDownloading = () => {
   const inputFeed = document.getElementById('inputFeed');
   submitBtn.disabled = true;
   inputFeed.setAttribute('readonly', '');
-  $('.alert').remove(this);
   makeAlert('info', 'Loading...');
 };
 
@@ -121,7 +119,6 @@ const processErrors = (err) => {
     $('#feedTable').attr('hidden', '');
   }
   activateForm();
-  $('.alert').remove(this);
   makeAlert('danger', err);
 };
 

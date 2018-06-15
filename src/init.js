@@ -83,21 +83,23 @@ export default () => {
     state.articlesData = newArticlesData;
   };
 
-  const updateArticles = () => {
+  const updateArticles = async () => {
     const feedLinks = _.keys(state.feeds);
     const promisesArr = feedLinks.map(link => axios.get(`${proxy}${link}`));
-    Promise.all(promisesArr)
-      .then((responses) => {
-        const rssDataArr = responses.map(({ data }) => parseRss(data));
-        const newArticlesData = {
-          articleLinks: makeUnionList(rssDataArr, 'articleLinks'),
-          articleTitles: makeUnionList(rssDataArr, 'articleTitles'),
-          articleDescriptions: makeUnionList(rssDataArr, 'articleDescriptions'),
-        };
-        updateArticlesData(newArticlesData);
-        renderers.updateArticlesList(state.articlesData);
-        setTimeout(() => updateArticles(), 5000);
-      });
+    try {
+      const responses = await Promise.all(promisesArr);
+      const rssDataArr = responses.map(({ data }) => parseRss(data));
+      const newArticlesData = {
+        articleLinks: makeUnionList(rssDataArr, 'articleLinks'),
+        articleTitles: makeUnionList(rssDataArr, 'articleTitles'),
+        articleDescriptions: makeUnionList(rssDataArr, 'articleDescriptions'),
+      };
+      updateArticlesData(newArticlesData);
+      renderers.updateArticlesList(state.articlesData);
+      setTimeout(() => updateArticles(), 5000);
+    } catch (error) {
+      renderers.processErrors(error);
+    }
   };
 
   $('#modalDescription')
@@ -116,18 +118,21 @@ export default () => {
   });
 
   const inputForm = document.getElementById('inputForm');
-  inputForm.addEventListener('submit', (e) => {
+  inputForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (state.checkUrlResult === 'valid') {
       const feedUrl = state.url;
       renderers.launchDownloading();
-      axios.get(`${proxy}${feedUrl}`)
-        .then(response => renderers.manageLoadingState(response))
-        .then(data => parseRss(data))
-        .then(rssData => saveRss(rssData, feedUrl))
-        .then(() => renderers.makeFeedList(state.feeds, feedUrl))
-        .then(() => renderers.updateArticlesList(state.articlesData))
-        .catch(renderers.processErrors);
+      try {
+        const response = await axios.get(`${proxy}${feedUrl}`);
+        const data = renderers.manageLoadingState(response);
+        const rssData = parseRss(data);
+        saveRss(rssData, feedUrl);
+        renderers.makeFeedList(state.feeds, feedUrl);
+        renderers.updateArticlesList(state.articlesData);
+      } catch (error) {
+        renderers.processErrors(error);
+      }
     }
   });
 
