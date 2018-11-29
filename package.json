@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gabos31/project-lvl3-s258.git"
+    "url": "git+https://github.com/gabos31/rss-loader.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/gabos31/project-lvl3-s258/issues"
+    "url": "https://github.com/gabos31/rss-loader/issues"
   },
-  "homepage": "https://github.com/gabos31/project-lvl3-s258#readme",
+  "homepage": "https://github.com/gabos31/rss-loader#readme",
   "dependencies": {
     "axios": "^0.18.0",
     "bootstrap": "^4.1.1",
